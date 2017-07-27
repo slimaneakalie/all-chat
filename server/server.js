@@ -17,6 +17,12 @@ io.on('connection', (socket) =>{
 	socket.on('disconnect', () => {
 		console.log("New user disconnected");
 	});
+
+	socket.on('createMessage', (message) => {
+		console.log('New message was created : ', message);
+	});
+
+	socket.emit('newMessage', { from : "ana@gmail.com", text : "Ini ha ini haha", createdAt : 200 });
 });
 
 server.listen(process.env.PORT, () => {
