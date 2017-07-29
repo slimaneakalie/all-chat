@@ -7,45 +7,58 @@ socket.on('disconnect', function(){
 	console.log('Disconnected from the server');
 });
 
-socket.on('newMessage', function(message){
-	var li = jQuery('<li></li>');
-	var messages = jQuery('#messages');
+function renderTemplate(templateId, obj)
+{
+	var template = jQuery('#'+templateId).html();
+	var html = Mustache.render(template, obj);
+	jQuery('#messages').append(html);
+}
 
-	li.text(`${message.from} : ${message.text}`);
-	messages.append(li);
+socket.on('newMessage', function(message){
+	var obj = {
+		text : message.text,
+		from : message.from,
+		createdAt : moment(message.createdAt).format('h:mm a')
+	}
+	renderTemplate('messageTemplate', obj);
 });
 
 socket.on('newLocationMessage', function(message){
-	var li = jQuery('<li></li>');
-	var a = jQuery('<a>My current location</a>');
-	var messages = jQuery('#messages');
-	
-	a.attr('target', '_blank');
-	a.attr('href', message.url);
-	li.text(`${message.from} : `);
-	li.append(a);
-	messages.append(li);
+	var obj = {
+		url : message.url,
+		from : message.from,
+		createdAt : moment(message.createdAt).format('h:mm a')
+	}
+	renderTemplate('locationMsgTemplate', obj);
 });
 
+var messageTextField = jQuery('[name=content]');
 jQuery('#messageForm').on('submit', function(ev){
 	ev.preventDefault();
 	socket.emit('createMessage', { 
 		from : "Slimane",
-		text : jQuery('[name=content]').val()
-		}, function (){});
+		text : messageTextField.val()
+		}, function (){
+			messageTextField.val('');
+		});
 });
 
 var sendLocation = jQuery('#sendLocation');
 sendLocation.on('click', function(){
 	if (!navigator.geolocation)
 		return alert('Geolocation not supported by your browser');
+	sendLocation.attr('disabled', 'disabled').text('Send location ...');
+	
 	navigator.geolocation.getCurrentPosition(function(position){
+		sendLocation.removeAttr('disabled').text('Send location');
 		socket.emit('createLocationMessage', {
 			latitude : position.coords.latitude,
 			longitude : position.coords.longitude
 		});
 		console.log(position);
 	}, function(){
+		sendLocation.removeAttr('disabled').text('Send location');
+		sendLocation.val('Send location');
 		alert('Unable to fetch geolocation');
 	});
 });
