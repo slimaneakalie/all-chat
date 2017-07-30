@@ -1,6 +1,15 @@
 var socket = io();
 socket.on('connect',function(){
 	console.log('Connected to the server');
+	var params = jQuery.deparam(window.location.search);
+	socket.emit('join', params, function(err){
+		if (err){
+			alert(err);
+			window.location.href = '/';
+		}
+		else
+			console.log('No error');
+	});
 });
 
 socket.on('disconnect', function(){
@@ -31,6 +40,16 @@ socket.on('newLocationMessage', function(message){
 		createdAt : moment(message.createdAt).format('h:mm a')
 	}
 	renderTemplate('locationMsgTemplate', obj);
+});
+
+socket.on('updateUserList', function(users){
+	var ul = jQuery('<ul></ul>');
+
+	users.forEach(function (user){
+		ul.append(jQuery('<li></li>').text(user));
+	});
+
+	jQuery('#users').html(ul);
 });
 
 var messageTextField = jQuery('[name=content]');
@@ -64,7 +83,8 @@ sendLocation.on('click', function(){
 	});
 });
 
-function scrollToBottom(){
+function scrollToBottom()
+{
 	var messages = jQuery('#messages');
 	var newMessage = messages.children('li:last-child');
 

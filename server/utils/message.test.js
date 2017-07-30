@@ -16,8 +16,8 @@ describe('generateLocationMessage', () => {
 		var obj = { from : 'Admin', latitude : 55, longitude : 32 };
 		var url = `https://www.google.com/maps?q=${obj.latitude},${obj.longitude}`;
 		var res = generateLocationMessage(obj.from, obj.latitude, obj.longitude);
-		
-		expect(res).toInclude({from, url};
+		var from = obj.from;
+		expect(res).toInclude({ from, url });
 		expect(res.createdAt).toBeA('number');
 		done();
 	});
