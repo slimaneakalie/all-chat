@@ -30,6 +30,7 @@ socket.on('newMessage', function(message){
 		from : message.from,
 		createdAt : moment(message.createdAt).format('h:mm a')
 	}
+
 	renderTemplate('messageTemplate', obj);
 });
 
@@ -56,8 +57,7 @@ var messageTextField = jQuery('[name=content]');
 jQuery('#messageForm').on('submit', function(ev){
 	ev.preventDefault();
 	socket.emit('createMessage', { 
-		from : "Slimane",
-		text : messageTextField.val()
+			text : messageTextField.val()
 		}, function (){
 			messageTextField.val('');
 		});

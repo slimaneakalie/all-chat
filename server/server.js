@@ -19,13 +19,17 @@ if (!process.env.PORT)
 app.use(express.static(publicPath));
 io.on('connection', (socket) =>{
 	socket.on('createMessage', (message, callback) => {
-		io.emit('newMessage', generateMessage(message.from, message.text));
-		callback();
-		/* socket.broadcast.emit('newMessage',generateMessage(message.from, message.text)); */
+		user = users.getUser(socket.id);
+		if ( user && isRealString(message.text) ){
+			io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+			callback();
+		}
 	});
 
 	socket.on('createLocationMessage', function(coordinates){
-		io.emit('newLocationMessage', generateLocationMessage('Admin', coordinates.latitude, coordinates.longitude));
+		user = users.getUser(socket.id);
+		if (user)
+			io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coordinates.latitude, coordinates.longitude));
 	});
 
 	socket.on ('join', function(params, callback){
