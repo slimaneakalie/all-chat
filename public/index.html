@@ -4,23 +4,123 @@
 	<title>Join | chat app</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body class="centered-form">
 	<div class="centered-form__form">
-		<form action="/chat.html">
+		<!-- <form action="/chat.html"> -->
 			<div class="form-field">
-				<label>Display name</label>
-				<input type="text" name="name" autofocus>
+				<div class="container">
+				  <img src="images/user_icon.png" class="rounded-circle img-fluid image">
+				  <div class="middle">
+				    <div class="text">
+				    	<a href="#">
+				    		<img src="images/pencil.png" alt="modify">
+				    	</a>
+				    </div>
+				  </div>
+				</div>
 			</div>
+
 			<div class="form-field">
-				<label>Room name</label>
-				<input type="text" name="room" autofocus>
+				<input type="text" id="displayName" autofocus="on" placeholder="Display name">
 			</div>
+
 			<div class="form-field">
-				<button>Join</button>
+				<div class="tab">
+			        <button id="createRoomLink" class="tablinks active">
+			        	Create a room
+			        </button>
+			        <button id="enterRoomLink" class="tablinks">
+			        	Enter a room
+			        </button>
+			    </div>
 			</div>
-		</form>
+
+			<div id="createRoomTab" class="form-field tabcontent activeContent">
+				<input type="text" id="staticRoom" placeholder="Room name">
+			</div>
+
+			<div id="enterRoomTab" class="form-field tabcontent">
+				<select class="custom-select" id="roomsSelect">
+  				</select>
+			</div>
+
+			<div class="footer form-field">
+				<button id="join" class="btn btn-success">Join</button>
+				<button id="about" class="btn btn-primary">About</button>
+			</div>
+		<!-- </form> -->
 	</div>
 </body>
+
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="js/libs/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="js/libs/tether.min.js"></script>
+<script type="text/javascript" src="js/libs/bootstrap.js"></script>
+<script type="text/javascript" src="js/constants.js"></script>
+<script type="text/javascript" src="js/general.js"></script>
+
+
+<!-- Modals -->
+	<!-- About modal -->
+	<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	      	<h5 class="modal-title" id="exampleModalLabel">Chat app</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	       	 This is app is bla bla bla bla bla bla bla bla bla
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- Room required modal -->
+	<div class="modal fade" id="roomRequiredModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	      	<h5 class="modal-title" id="exampleModalLabel">Chat app</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	       	 Room name is required
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- Name required modal -->
+	<div class="modal fade" id="nameRequiredModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	      	<h5 class="modal-title" id="exampleModalLabel">Chat app</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	       	 Display name is required
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
 </html>

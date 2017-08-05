@@ -1,3 +1,6 @@
+//Require lodash
+const _ = require('lodash');
+//User class definition
 class Users {
 	constructor (){
 		this.users = [];
@@ -29,6 +32,12 @@ class Users {
 	{
 		var userRes = this.users.filter((user) => user.id == id);
 		return userRes[0];
+	}
+
+	getRooms()
+	{
+		var rooms = _.uniqBy(this.users, 'room').map((user) => user.room);
+		return rooms;
 	}
 }
 

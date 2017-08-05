@@ -54,6 +54,11 @@ io.on('connection', (socket) =>{
 			socket.broadcast.to(user.room).emit('newMessage', generateMessage ('Admin', `${user.name} has left`) );
 		}
 	});
+	
+	socket.on('getRooms', () => {
+		socket.emit('getRoomsResponse', users.getRooms());
+	});
+	
 });
 
 server.listen(process.env.PORT, () => {

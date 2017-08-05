@@ -5,11 +5,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 	<title>Chat | chat app</title>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
 </head>
 <body class="chat">
 	<div class="chat__sidebar">
 		<h3>Users</h3>
-		<div id="users"></div>
+		<div id="users">
+		</div>
 	</div>
 
 	<div class="chat__main">
@@ -17,16 +19,16 @@
 		<div class="chat__footer">
 			<form id="messageForm">
 				<input type="text" name="content" placeholder="Type a message" autofocus autocomplete="off" />
-				<button>Send</button>
+				<button class="btn btn-success">Send</button>
 			</form>
-			<button id="sendLocation">Send location</button>
+			<button id="sendLocation" class="btn btn-primary">Send location</button>
 		</div>
 	</div>
 
 	<script id="messageTemplate" type="text/template">
 		<li class="message">
 			<div class="message__title">
-				<h4>{{from}}</h4>
+				<b>{{from}}</b> &nbsp;
 				<span>{{createdAt}}</span>
 			</div>
 			<div class="message__body">
@@ -45,12 +47,39 @@
 			</div>
 		</li>
 	</script>
-
-	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-	<script type="text/javascript" src="js/libs/jquery-3.2.1.min.js"></script>
-	<script type="text/javascript" src="js/libs/moment.js"></script>
-	<script type="text/javascript" src="js/libs/mustache.js"></script>
-	<script type="text/javascript" src="js/libs/deparam.js"></script>
-	<script type="text/javascript" src="js/chat.js"></script>
 </body>
+
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="js/libs/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="js/libs/moment.js"></script>
+<script type="text/javascript" src="js/libs/mustache.js"></script>
+<script type="text/javascript" src="js/libs/deparam.js"></script>
+<script type="text/javascript" src="js/libs/tether.min.js"></script>
+<script type="text/javascript" src="js/libs/bootstrap.js"></script>
+<script type="text/javascript" src="js/constants.js"></script>
+<script type="text/javascript" src="js/chat.js"></script>
+
+
+<!-- Modals -->
+	<!-- User details modal -->
+	<div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	      	<h5 class="modal-title" id="exampleModalLabel">User 0</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	       	 <img src="images/user_icon.png" class="rounded-circle img-fluid userMini"> &nbsp; &nbsp;
+	       	 Connected from 3 hours ago
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
 </html>

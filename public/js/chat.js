@@ -46,11 +46,21 @@ socket.on('newLocationMessage', function(message){
 socket.on('updateUserList', function(users){
 	var ul = jQuery('<ul></ul>');
 
-	users.forEach(function (user){
-		ul.append(jQuery('<li></li>').text(user));
+	users.forEach(function (user){		
+		img = jQuery('<img/>');
+		img.attr('src', 'images/user_icon.png');
+		img.attr('class', 'rounded-circle img-fluid userMini');
+
+		li = jQuery('<li></li>');
+		li.attr('class', USERS_CLASS_NAME);
+		li.append(img);
+		li.append('&nbsp;'+user);
+
+		ul.append(li);
 	});
 
 	jQuery('#users').html(ul);
+	initUsers();
 });
 
 var messageTextField = jQuery('[name=content]');
@@ -96,4 +106,15 @@ function scrollToBottom()
 
 	if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight)
 		messages.scrollTop(scrollHeight);
+}
+
+function initUsers()
+{
+	var tabUsers = byClass(USERS_CLASS_NAME);
+
+	for (var i = 0; i < tabUsers.length; i++) {
+		tabUsers[i].onclick = function() {
+			$('#userModal').modal('show');
+		};
+	}
 }
