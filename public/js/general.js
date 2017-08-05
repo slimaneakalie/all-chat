@@ -88,13 +88,48 @@ function addActiveRooms(rooms)
 
 function initButtons()
 {
-  var join, about;
+  var join, about, uploadField, upload;
+
+  uploadField = byId(UPLOAD_FIELD_ID);
+  uploadField.onchange = function(){
+    verifyFile(this, this.value);
+  };
+
+  upload = byId(UPLOAD_BUTTON_ID);
+  upload.onclick = function () {
+    uploadField.click();
+  };
 
   about = byId(ABOUT_BUTTON_ID);
   about.onclick = function(){ $('#aboutModal').modal('show'); }
 
   join = byId(JOIN_BUTTON_ID);
   join.onclick = function(){ joinFunction(ENTER_CODE); }
+}
+
+function verifyFile(uploadField, fileName) {
+  var extension = fileName.substr(fileName.lastIndexOf('.')).toLowerCase();
+  
+  for (var i = 0; i < PICTURES_ALLOWED.length; i++)
+    if (extension === PICTURES_ALLOWED[i])
+      break;
+
+  if (i < PICTURES_ALLOWED.length)
+  {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+        $('#'+CURRENT_PHOTO_ID)
+        .attr('src', e.target.result)
+        .width(512)
+        .height('auto');
+    };
+    reader.readAsDataURL(uploadField.files[0]);
+    
+  }else{
+    uploadField.value = null;
+    $('#pictureErrorModal').modal('show');
+    uploadField.click();
+  }
 }
 
 function joinFunction(code)
@@ -133,7 +168,27 @@ function submit(displayName, roomName)
     return;
   }
 
-  url = 'chat.html?'+jQuery.param({name : displayName, room : roomName});
-  window.location.href = url;
+  var uploadField = byId(UPLOAD_FIELD_ID);
+  if (uploadField.value)
+  {
+    uploadField = $('#'+UPLOAD_FIELD_ID);
+
+    console.dir(uploadField[0].files);
+
+    var form = new FormData($('#formUpload')[0]);
+    $.ajax({
+            type: 'POST',
+            url: '/upload',
+            data: form,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                console.log('upload successful! : '+data);
+            }
+        });
+  }else
+    console.log('Yeaaah man');
+  var url = 'chat.html?'+jQuery.param({name : displayName, room : roomName});
+  //window.location.href = url;
 
 }

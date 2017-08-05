@@ -1,4 +1,6 @@
 const path = require('path');
+const multer = require('multer');
+const bodyParser = require('body-parser');
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -10,6 +12,16 @@ const io = socketIo(server);
 const { generateMessage, generateLocationMessage } = require('./utils/message');
 const { isRealString } = require('./utils/validation');
 const { Users } = require('./utils/users');
+const storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        callback(null, path.join(__dirname, '../images'));
+    },
+    filename: function (req, file, callback) {
+        callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+    }
+});
+
+const upload = multer({storage}).array("upload", 3);
 
 var users = new Users();
 
@@ -17,6 +29,19 @@ if (!process.env.PORT)
 	process.env.PORT = 300;
 
 app.use(express.static(publicPath));
+app.use(bodyParser.json());
+
+app.post("/upload", function (req, res) {
+	console.log('Upload post invoked');
+    upload(req, res, function (err) { 
+        if (err){
+        	console.log(err);
+            return res.end("Something went wrong!"); 
+        }
+        return res.end("File uploaded sucessfully!."); 
+    }); 
+});
+
 io.on('connection', (socket) =>{
 	socket.on('createMessage', (message, callback) => {
 		user = users.getUser(socket.id);

@@ -11,9 +11,13 @@ const DISPLAY_NAME       = "displayName";
 const ROOMS_SELECT_ID    = "roomsSelect";
 const ABOUT_BUTTON_ID    = "about";
 const JOIN_BUTTON_ID     = "join";
+const UPLOAD_BUTTON_ID   = "uploadPhotoButton";
+const UPLOAD_FIELD_ID    = "uploadPhoto";
+const CURRENT_PHOTO_ID   = "currentPhoto";
 const NO_ROOM_MSG        = "No active room for now";
 const ENTER_CODE         = 13;
 const USERS_CLASS_NAME   = 'newUser';
+const PICTURES_ALLOWED   = ['.jpg', '.png', '.jpeg', '.bmp', '.gif'];
 
 //Dom getters
 function byId(id) { return document.getElementById(id); }

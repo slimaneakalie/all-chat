@@ -284,6 +284,16 @@ div.tab button.active {
   float: right;
 }
 
+#uploadPhoto, #formUpload
+{
+  display: none;
+}
+
+#uploadPhotoButton
+{
+  cursor: pointer; cursor: hand;
+}
+
 .footer
 {
   display: inline-table;
