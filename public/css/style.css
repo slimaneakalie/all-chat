@@ -123,7 +123,7 @@ h3 {
   margin-right: 10px;
 }
 
-.chat__footer input {
+.chat__footer textarea {
   border: none;
   padding: 10px;
   flex-grow: 1;
@@ -302,8 +302,15 @@ div.tab button.active {
 
 .userMini
 {
-  width: 20%;
+  width: 35px;
+  height: 35px;
   vertical-align: middle;
+}
+
+.userMax
+{
+    width: 230px;
+    height: 230px;
 }
 
 button:hover, .newUser:hover
@@ -311,3 +318,91 @@ button:hover, .newUser:hover
   filter: brightness(70%);
   cursor: pointer; cursor: hand;
 }
+
+
+  ul.ChatLog {
+    list-style: none;
+  }
+
+  .ChatLog {
+    /*max-width: 20em;*/
+    /*margin: 0 auto;*/
+  }
+  .ChatLog .ChatLog__entry {
+    margin: .5em;
+  }
+
+  .ChatLog__entry {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    max-width: 100%;
+  }
+
+  .ChatLog__entry.ChatLog__entry_mine {
+    flex-direction: row-reverse;  
+  }
+
+  .ChatLog__avatar {
+    flex-shrink: 0;
+    flex-grow: 0;
+    z-index: 1;
+    height: 50px;
+    width: 50px;
+    border-radius: 25px;
+    
+  }
+
+  /*.ChatLog__entry.ChatLog__entry_mine 
+  .ChatLog__avatar {
+    display: none;
+  }*/
+
+  .ChatLog__entry .ChatLog__message {
+    position: relative;
+    margin: 0 12px;
+  }
+
+  .ChatLog__entry .ChatLog__message::before {
+    position: absolute;
+    right: auto;
+    bottom: .6em;
+    left: -12px;
+    height: 0;
+    content: '';
+    border: 6px solid transparent;
+    border-right-color: #ddd;
+    z-index: 2;
+  }
+
+  .ChatLog__entry.ChatLog__entry_mine .ChatLog__message::before {
+    right: -12px;
+    bottom: .6em;
+    left: auto;
+    border: 6px solid transparent;
+    border-left-color: #08f;
+  }
+
+  .ChatLog__message {
+    background-color: #ddd;
+    padding: .5em;
+    border-radius: 4px;
+    font-weight: lighter;
+    max-width: 70%;
+  }
+
+  .ChatLog__entry.ChatLog__entry_mine .ChatLog__message {
+    border-top: 1px solid #07f;
+    border-bottom: 1px solid #07f;
+    background-color: #08f;
+    color: #fff;
+  }
+
+  .ChatLog__message .ChatLog__timestamp {
+      display: none;
+  }
+
+  .locationMsg , .locationMsg:hover
+  {
+    color: white;
+  }

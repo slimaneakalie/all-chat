@@ -4,21 +4,22 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 	<title>Chat | chat app</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body class="chat">
 	<div class="chat__sidebar">
-		<h3>Users</h3>
+		<h3>Active users</h3>
 		<div id="users">
 		</div>
 	</div>
 
 	<div class="chat__main">
-		<ol id="messages" class="chat__messages"></ol>
+		<ul id="messages" class="ChatLog chat__messages"></ul>
+		
 		<div class="chat__footer">
 			<form id="messageForm">
-				<input type="text" name="content" placeholder="Type a message" autofocus autocomplete="off" />
+				<textarea name="content" placeholder="Type a message" autofocus autocomplete="off"></textarea>
 				<button class="btn btn-success">Send</button>
 			</form>
 			<button id="sendLocation" class="btn btn-primary">Send location</button>
@@ -26,18 +27,22 @@
 	</div>
 
 	<script id="messageTemplate" type="text/template">
-		<li class="message">
-			<div class="message__title">
-				<b>{{from}}</b> &nbsp;
-				<span>{{createdAt}}</span>
-			</div>
-			<div class="message__body">
-				<p>{{text}}</p>
-			</div>
-		</li>
+		<li class="{{itemClass}}" senderId="{{senderId}}">
+		    <img class="ChatLog__avatar" src="{{imgSrc}}" data-toggle="tooltip" data-placement="bottom" title="{{from}}"/>
+		    <p class="ChatLog__message" data-toggle="tooltip" data-placement="bottom" title="{{createdAt}}">
+		      {{{text}}}
+		    </p>
+		 </li>
 	</script>
+
 	<script id="locationMsgTemplate" type="text/template">
-		<li class="message">
+		<li class="{{itemClass}}" senderId="{{senderId}}">
+		    <img class="ChatLog__avatar" src="{{imgSrc}}" data-toggle="tooltip" data-placement="bottom" title="{{from}}"/>
+		    <p class="ChatLog__message" data-toggle="tooltip" data-placement="bottom" title="{{createdAt}}">
+		      <a href="{{url}}" target="_blank" class="locationMsg">Visit this link to know my current location</a>
+		    </p>
+		 </li>
+		<!-- <li class="message">
 			<div class="message__title">
 				<h4>{{from}}</h4>
 				<span>{{createdAt}}</span>
@@ -45,7 +50,7 @@
 			<div class="message__body">
 				<a href="{{url}}" target="_blank">My current location</a>
 			</div>
-		</li>
+		</li> -->
 	</script>
 </body>
 
@@ -62,18 +67,19 @@
 
 <!-- Modals -->
 	<!-- User details modal -->
-	<div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userNameModal" aria-hidden="true">
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	      	<h5 class="modal-title" id="exampleModalLabel">User 0</h5>
+	      	<h5 class="modal-title" id="userNameModal"></h5>
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 	          <span aria-hidden="true">&times;</span>
 	        </button>
 	      </div>
 	      <div class="modal-body">
-	       	 <img src="images/user_icon.png" class="rounded-circle img-fluid userMini"> &nbsp; &nbsp;
-	       	 Connected from 3 hours ago
+	       	 <img src="images/user_icon.png" class="rounded-circle img-fluid userMax" id="userModalImg"> &nbsp; &nbsp;
+
+	       	 <label id="userModalTxt"></label>
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>

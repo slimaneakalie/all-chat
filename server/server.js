@@ -1,9 +1,14 @@
 const path = require('path');
+const fs = require('fs');
 const multer = require('multer');
 const bodyParser = require('body-parser');
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const uuidv1 = require('uuid/v1');
+
+const DEFAULT_UPLOAD_NAME = uuidv1();
+const UPLOAD_DIR = path.join(__dirname, '../public/uploads');
 
 const publicPath = path.join(__dirname, '../public');
 const app = express();
@@ -14,16 +19,19 @@ const { isRealString } = require('./utils/validation');
 const { Users } = require('./utils/users');
 const storage = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, path.join(__dirname, '../images'));
+        callback(null, UPLOAD_DIR);
     },
     filename: function (req, file, callback) {
-        callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+        callback(null, DEFAULT_UPLOAD_NAME);
     }
 });
 
 const upload = multer({storage}).array("upload", 3);
 
+
 var users = new Users();
+
+var adminUser = { id : uuidv1(), name : 'Admin'};
 
 if (!process.env.PORT)
 	process.env.PORT = 300;
@@ -34,11 +42,22 @@ app.use(bodyParser.json());
 app.post("/upload", function (req, res) {
 	console.log('Upload post invoked');
     upload(req, res, function (err) { 
+    	console.log()
         if (err){
         	console.log(err);
-            return res.end("Something went wrong!"); 
+            return res.send({ err : "Something went wrong!"}); 
         }
-        return res.end("File uploaded sucessfully!."); 
+        else
+        {
+        	var newUuid = uuidv1();
+        	var newPath = path.join(UPLOAD_DIR, newUuid);
+        	var oldPath = path.join(UPLOAD_DIR, DEFAULT_UPLOAD_NAME)
+        	console.log('Old path : '+oldPath);
+        	console.log('New path : '+newPath);
+        	fs.rename(oldPath, newPath, function (){
+        		res.send({ fileName : newUuid });
+        	});
+        }
     }); 
 });
 
@@ -46,7 +65,7 @@ io.on('connection', (socket) =>{
 	socket.on('createMessage', (message, callback) => {
 		user = users.getUser(socket.id);
 		if ( user && isRealString(message.text) ){
-			io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+			io.to(user.room).emit('newMessage', generateMessage(user, message.text));
 			callback();
 		}
 	});
@@ -54,7 +73,7 @@ io.on('connection', (socket) =>{
 	socket.on('createLocationMessage', function(coordinates){
 		user = users.getUser(socket.id);
 		if (user)
-			io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coordinates.latitude, coordinates.longitude));
+			io.to(user.room).emit('newLocationMessage', generateLocationMessage(user, coordinates.latitude, coordinates.longitude));
 	});
 
 	socket.on ('join', function(params, callback){
@@ -63,11 +82,11 @@ io.on('connection', (socket) =>{
 		socket.join(params.room);
 
 		users.removeUser(socket.id);
-		users.addUser(socket.id, params.name, params.room);
+		users.addUser(socket.id, params.name, params.room, params.fileName);
 		io.to(params.room).emit('updateUserList', users.getUserList(params.room));
 
-		socket.emit('newMessage', generateMessage ('Admin', "Welcome to the chat app") );
-		socket.broadcast.to(params.room).emit('newMessage', generateMessage ('Admin', `${params.name} has joined`) );
+		socket.emit('newMessage', generateMessage(adminUser, "Welcome to the chat app") );
+		socket.broadcast.to(params.room).emit('newMessage', generateMessage (adminUser, `${params.name} has joined`) );
 		callback();
 	});
 
@@ -75,8 +94,20 @@ io.on('connection', (socket) =>{
 		var user = users.removeUser(socket.id);
 		if (user)
 		{
+			if (user.fileName && user.fileName.length)
+			{
+				var file = path.join(UPLOAD_DIR, user.fileName);
+				fs.exists(file, (exists) => {
+					if (exists)
+						fs.unlink(file, (err) => {
+  							if (err) throw err
+  						});
+				});
+				
+			}
+				
 			io.to(user.room).emit('updateUserList', users.getUserList(user.room));
-			socket.broadcast.to(user.room).emit('newMessage', generateMessage ('Admin', `${user.name} has left`) );
+			socket.broadcast.to(user.room).emit('newMessage', generateMessage (adminUser, `${user.name} has left`) );
 		}
 	});
 	

@@ -92,7 +92,8 @@ function initButtons()
 
   uploadField = byId(UPLOAD_FIELD_ID);
   uploadField.onchange = function(){
-    verifyFile(this, this.value);
+    if (this.value)
+      verifyFile(this);
   };
 
   upload = byId(UPLOAD_BUTTON_ID);
@@ -107,7 +108,8 @@ function initButtons()
   join.onclick = function(){ joinFunction(ENTER_CODE); }
 }
 
-function verifyFile(uploadField, fileName) {
+function verifyFile(uploadField) {
+  var fileName = uploadField.value;
   var extension = fileName.substr(fileName.lastIndexOf('.')).toLowerCase();
   
   for (var i = 0; i < PICTURES_ALLOWED.length; i++)
@@ -120,8 +122,8 @@ function verifyFile(uploadField, fileName) {
     reader.onload = function (e) {
         $('#'+CURRENT_PHOTO_ID)
         .attr('src', e.target.result)
-        .width(512)
-        .height('auto');
+        .width(230)
+        .height(230);
     };
     reader.readAsDataURL(uploadField.files[0]);
     
@@ -167,14 +169,13 @@ function submit(displayName, roomName)
     $('#roomRequiredModal').modal('show');
     return;
   }
-
+  var params = {name : displayName, room : roomName, fileName : ''};
   var uploadField = byId(UPLOAD_FIELD_ID);
   if (uploadField.value)
   {
     uploadField = $('#'+UPLOAD_FIELD_ID);
 
     console.dir(uploadField[0].files);
-
     var form = new FormData($('#formUpload')[0]);
     $.ajax({
             type: 'POST',
@@ -183,12 +184,20 @@ function submit(displayName, roomName)
             contentType: false,
             processData: false,
             success: function (data) {
-                console.log('upload successful! : '+data);
+                console.log('upload successful! : ');
+                console.log(data);
+                if (data.fileName)
+                  params.fileName = data.fileName;
+                else
+                  alert('Unable to upload your photo');
+
+                var url = 'chat.html?'+jQuery.param(params);
+                window.location.href = url;
             }
         });
-  }else
+  }else{
     console.log('Yeaaah man');
-  var url = 'chat.html?'+jQuery.param({name : displayName, room : roomName});
-  //window.location.href = url;
-
+    var url = 'chat.html?'+jQuery.param(params);
+    window.location.href = url;
+  }
 }

@@ -1,4 +1,5 @@
 var socket = io();
+socket.frej = "ABC12333";
 socket.on('connect',function(){
 	console.log('Connected to the server');
 	var params = jQuery.deparam(window.location.search);
@@ -16,45 +17,43 @@ socket.on('disconnect', function(){
 	console.log('Disconnected from the server');
 });
 
-function renderTemplate(templateId, obj)
-{
-	var template = jQuery('#'+templateId).html();
-	var html = Mustache.render(template, obj);
-	jQuery('#messages').append(html);
-	scrollToBottom();
-}
-
 socket.on('newMessage', function(message){
-	var obj = {
-		text : message.text,
-		from : message.from,
-		createdAt : moment(message.createdAt).format('h:mm a')
-	}
-
+	var obj = getNewMessageObject(message);
+	obj.text = message.text;
+	
 	renderTemplate('messageTemplate', obj);
 });
 
 socket.on('newLocationMessage', function(message){
-	var obj = {
-		url : message.url,
-		from : message.from,
-		createdAt : moment(message.createdAt).format('h:mm a')
-	}
+	var obj = getNewMessageObject(message);
+	obj.url = message.url;
+
 	renderTemplate('locationMsgTemplate', obj);
 });
 
 socket.on('updateUserList', function(users){
 	var ul = jQuery('<ul></ul>');
-
+	console.log('Users array : ');
+	console.log(users);
 	users.forEach(function (user){		
 		img = jQuery('<img/>');
-		img.attr('src', 'images/user_icon.png');
+		var test = false;
+
+		if (user.fileName && user.fileName.length)
+			img.attr('src', 'uploads/'+user.fileName);
+		else
+			img.attr('src', 'images/user_icon.png');
 		img.attr('class', 'rounded-circle img-fluid userMini');
+
+		label = jQuery('<label></label>');
+		label.html('&nbsp;'+user.name);
 
 		li = jQuery('<li></li>');
 		li.attr('class', USERS_CLASS_NAME);
+		li.attr('log', ''+user.logginAt);
+
 		li.append(img);
-		li.append('&nbsp;'+user);
+		li.append(label);
 
 		ul.append(li);
 	});
@@ -63,13 +62,29 @@ socket.on('updateUserList', function(users){
 	initUsers();
 });
 
-var messageTextField = jQuery('[name=content]');
-jQuery('#messageForm').on('submit', function(ev){
+var messageTextArea = jQuery('[name=content]');
+var messageForm = jQuery('#messageForm');
+
+messageTextArea.keydown(function(ev){
+	if (ev.keyCode == ENTER_CODE)
+	{
+		ev.preventDefault();
+		if (ev.shiftKey){
+	    	$(this).val($(this).val() + "\n");
+	    	$(this).scrollTop($(this)[0].scrollHeight);
+  		}
+  		else
+			messageForm.submit();
+	}
+});
+
+messageForm.on('submit', function(ev){
 	ev.preventDefault();
+	
 	socket.emit('createMessage', { 
-			text : messageTextField.val()
+			text : messageTextArea.val().replace(/\n/g, '<br />')
 		}, function (){
-			messageTextField.val('');
+			messageTextArea.val('');
 		});
 });
 
@@ -114,7 +129,54 @@ function initUsers()
 
 	for (var i = 0; i < tabUsers.length; i++) {
 		tabUsers[i].onclick = function() {
+			var children = this.children;
+			var modalImg = byId(USERMODALIMG);
+			modalImg.src = children[0].src
+
+			var modalTitle = byId(USERNAME_MODAL_ID);
+			modalTitle.innerHTML = children[1].innerHTML;
+
+			var modalTxt = byId(USER_MODAL_TXT_ID);
+			modalTxt.innerHTML = "Active "+moment(this.getAttribute('log')).fromNow();
+			console.log("this.getAttribute('log') : "+this.getAttribute('log')+" moment("+this.getAttribute('log')+" = "+moment(this.log).fromNow());
 			$('#userModal').modal('show');
 		};
 	}
+}
+
+function getNewMessageObject(message)
+{
+	var obj = {
+		senderId : message.from.id,
+		from : message.from.name,
+		createdAt : moment(message.createdAt).format('h:mm a'),
+		itemClass : 'ChatLog__entry'
+	}
+
+	var messages = jQuery('#messages');
+	var last = messages.children('li:last-child');
+	if (last.length)
+	{
+		var lastClass = last.attr('class');
+		if (last.attr('senderId') == obj.senderId)
+			obj.itemClass = lastClass;
+		else if (lastClass == 'ChatLog__entry')
+			obj.itemClass += ' ChatLog__entry_mine';
+	}
+
+	if (message.from.fileName)
+		obj.imgSrc = 'uploads/'+message.from.fileName;
+	else
+		obj.imgSrc = 'images/user_icon.png';
+
+	return obj;
+}
+
+function renderTemplate(templateId, obj)
+{
+	var template = jQuery('#'+templateId).html();
+	var html = Mustache.render(template, obj);
+	jQuery('#messages').append(html);
+	scrollToBottom();
+	$('[data-toggle="tooltip"]').tooltip();
 }

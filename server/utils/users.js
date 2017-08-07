@@ -1,14 +1,15 @@
 //Require lodash
 const _ = require('lodash');
+var moment = require('moment');
 //User class definition
 class Users {
 	constructor (){
 		this.users = [];
 	}
 
-	addUser(id, name, room)
+	addUser(id, name, room, fileName)
 	{
-		var newUser = {id, name, room};
+		var newUser = {id, name, room, fileName, logginAt : moment() };
 		this.users.push(newUser);
 		return newUser;
 	}
@@ -16,7 +17,11 @@ class Users {
 	getUserList(room)
 	{
 		var usersResult = this.users.filter((user) => user.room == room);
-		usersResult = usersResult.map((user) => user.name);
+		usersResult = usersResult.map((user) => {
+			return { name : user.name, fileName : user.fileName, logginAt : user.logginAt };
+		});
+		console.log('usersResult : ');
+		console.log(usersResult)
 		return usersResult;
 	}
 
