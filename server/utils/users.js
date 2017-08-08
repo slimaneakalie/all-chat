@@ -20,8 +20,7 @@ class Users {
 		usersResult = usersResult.map((user) => {
 			return { name : user.name, fileName : user.fileName, logginAt : user.logginAt };
 		});
-		console.log('usersResult : ');
-		console.log(usersResult)
+
 		return usersResult;
 	}
 

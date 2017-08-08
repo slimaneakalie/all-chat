@@ -134,23 +134,6 @@ h3 {
   padding: 10px;
 }
 
-.message {
-  padding: 10px;
-}
-
-.message__title {
-  display: flex;
-  margin-bottom: 5px;
-}
-
-.message__title h4 {
-  font-weight: 600;
-  margin-right: 10px;
-}
-
-.message__title span {
-  color: #999;
-}
 
 @media (max-width: 600px) {
   * {
@@ -173,10 +156,6 @@ h3 {
     margin-right: 0px;
   }
 }
-/*.container {
-    position: relative;
-    width: 50%;
-}*/
 
 .image {
   opacity: 1;
@@ -353,11 +332,6 @@ button:hover, .newUser:hover
     
   }
 
-  /*.ChatLog__entry.ChatLog__entry_mine 
-  .ChatLog__avatar {
-    display: none;
-  }*/
-
   .ChatLog__entry .ChatLog__message {
     position: relative;
     margin: 0 12px;
@@ -403,6 +377,21 @@ button:hover, .newUser:hover
   }
 
   .locationMsg , .locationMsg:hover
+  {
+    color: white;
+  }
+
+  .copyright
+  {
+    background-color: black;
+    text-align: center;
+    font-size: 10px;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+  }
+
+  .copyright a, .copyright a:hover
   {
     color: white;
   }

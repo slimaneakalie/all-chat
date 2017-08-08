@@ -8,6 +8,9 @@ const socketIo = require('socket.io');
 const uuidv1 = require('uuid/v1');
 
 const DEFAULT_UPLOAD_NAME = uuidv1();
+
+
+
 const UPLOAD_DIR = path.join(__dirname, '../public/uploads');
 
 const publicPath = path.join(__dirname, '../public');
@@ -40,9 +43,7 @@ app.use(express.static(publicPath));
 app.use(bodyParser.json());
 
 app.post("/upload", function (req, res) {
-	console.log('Upload post invoked');
     upload(req, res, function (err) { 
-    	console.log()
         if (err){
         	console.log(err);
             return res.send({ err : "Something went wrong!"}); 
@@ -52,8 +53,6 @@ app.post("/upload", function (req, res) {
         	var newUuid = uuidv1();
         	var newPath = path.join(UPLOAD_DIR, newUuid);
         	var oldPath = path.join(UPLOAD_DIR, DEFAULT_UPLOAD_NAME)
-        	console.log('Old path : '+oldPath);
-        	console.log('New path : '+newPath);
         	fs.rename(oldPath, newPath, function (){
         		res.send({ fileName : newUuid });
         	});
@@ -82,7 +81,7 @@ io.on('connection', (socket) =>{
 		socket.join(params.room);
 
 		users.removeUser(socket.id);
-		users.addUser(socket.id, params.name, params.room, params.fileName);
+		users.addUser(socket.id, params.name, params.room, params.n);
 		io.to(params.room).emit('updateUserList', users.getUserList(params.room));
 
 		socket.emit('newMessage', generateMessage(adminUser, "Welcome to the chat app") );

@@ -1,116 +1,119 @@
 var socket = io();
-socket.frej = "ABC12333";
-socket.on('connect',function(){
-	console.log('Connected to the server');
-	var params = jQuery.deparam(window.location.search);
-	socket.emit('join', params, function(err){
-		if (err){
-			alert(err);
-			window.location.href = '/';
+var messages = jQuery('#'+MESSAGES_ID);
+initSockets();
+initMessages();
+initButtons();
+
+function initSockets() {
+	socket.on('connect',function(){
+		var params = jQuery.deparam(window.location.search);
+		socket.emit(JOIN_EVENT, params, function(err){
+			if (err){
+				alert(err);
+				window.location.href = ROOT_DIR;
+			}
+		});
+	});
+
+	socket.on('disconnect', function(){});
+
+	socket.on(NEW_MSG_EVENT, function(message){
+		var obj = getNewMessageObject(message);
+		obj.text = message.text;
+		
+		renderTemplate(NORMAL_MSG_TEMPLATE, obj);
+	});
+
+	socket.on(NEW_LOCATION_MSG_EVENT, function(message){
+		var obj = getNewMessageObject(message);
+		obj.url = message.url;
+
+		renderTemplate(LOCATION_MSG_TEMPLATE, obj);
+	});
+
+	socket.on(UPDATE_USER_LIST_EVENT, function(users){
+		var ul = jQuery('<ul></ul>');
+
+		users.forEach(function (user){		
+			img = jQuery('<img/>');
+			if (user.fileName && user.fileName.length)
+				img.attr(SRC_ATTR, UPLOAD_DIR+user.fileName);
+			else
+				img.attr(SRC_ATTR, USER_ICON);
+			img.attr(CLASS_ATTR, 'rounded-circle img-fluid userMini');
+
+			label = jQuery('<label></label>');
+			label.html('&nbsp;'+user.name);
+
+			li = jQuery('<li></li>');
+			li.attr(CLASS_ATTR, USERS_CLASS_NAME);
+			li.attr(LOG_ATTR, ''+user.logginAt);
+
+			li.append(img);
+			li.append(label);
+
+			ul.append(li);
+		});
+
+		jQuery('#'+USERS_LABEL_ID).html(ul);
+		initUsers();
+	});
+}
+	
+
+function initMessages() {
+	var messageTextArea = jQuery('[name=content]');
+	var messageForm = jQuery('#'+MSG_FORM_ID);
+
+	messageTextArea.keydown(function(ev){
+		if (ev.keyCode == ENTER_CODE)
+		{
+			ev.preventDefault();
+			if (ev.shiftKey)
+			{
+		    	$(this).val($(this).val() + "\n");
+		    	$(this).scrollTop($(this)[0].scrollHeight);
+	  		}
+	  		else
+				messageForm.submit();
 		}
-		else
-			console.log('No error');
-	});
-});
-
-socket.on('disconnect', function(){
-	console.log('Disconnected from the server');
-});
-
-socket.on('newMessage', function(message){
-	var obj = getNewMessageObject(message);
-	obj.text = message.text;
-	
-	renderTemplate('messageTemplate', obj);
-});
-
-socket.on('newLocationMessage', function(message){
-	var obj = getNewMessageObject(message);
-	obj.url = message.url;
-
-	renderTemplate('locationMsgTemplate', obj);
-});
-
-socket.on('updateUserList', function(users){
-	var ul = jQuery('<ul></ul>');
-	console.log('Users array : ');
-	console.log(users);
-	users.forEach(function (user){		
-		img = jQuery('<img/>');
-		var test = false;
-
-		if (user.fileName && user.fileName.length)
-			img.attr('src', 'uploads/'+user.fileName);
-		else
-			img.attr('src', 'images/user_icon.png');
-		img.attr('class', 'rounded-circle img-fluid userMini');
-
-		label = jQuery('<label></label>');
-		label.html('&nbsp;'+user.name);
-
-		li = jQuery('<li></li>');
-		li.attr('class', USERS_CLASS_NAME);
-		li.attr('log', ''+user.logginAt);
-
-		li.append(img);
-		li.append(label);
-
-		ul.append(li);
 	});
 
-	jQuery('#users').html(ul);
-	initUsers();
-});
-
-var messageTextArea = jQuery('[name=content]');
-var messageForm = jQuery('#messageForm');
-
-messageTextArea.keydown(function(ev){
-	if (ev.keyCode == ENTER_CODE)
-	{
+	messageForm.on('submit', function(ev){
 		ev.preventDefault();
-		if (ev.shiftKey){
-	    	$(this).val($(this).val() + "\n");
-	    	$(this).scrollTop($(this)[0].scrollHeight);
-  		}
-  		else
-			messageForm.submit();
-	}
-});
-
-messageForm.on('submit', function(ev){
-	ev.preventDefault();
-	
-	socket.emit('createMessage', { 
-			text : messageTextArea.val().replace(/\n/g, '<br />')
-		}, function (){
-			messageTextArea.val('');
-		});
-});
-
-var sendLocation = jQuery('#sendLocation');
-sendLocation.on('click', function(){
-	if (!navigator.geolocation)
-		return alert('Geolocation not supported by your browser');
-	sendLocation.attr('disabled', 'disabled').text('Send location ...');
-	
-	navigator.geolocation.getCurrentPosition(function(position){
-		sendLocation.removeAttr('disabled').text('Send location');
-		socket.emit('createLocationMessage', {
-			latitude : position.coords.latitude,
-			longitude : position.coords.longitude
-		});
-		console.log(position);
-	}, function(){
-		sendLocation.removeAttr('disabled').text('Send location');
-		sendLocation.val('Send location');
-		alert('Unable to fetch geolocation');
+		
+		socket.emit(CREATE_MSG_EVENT, { 
+				text : messageTextArea.val().replace(/\n/g, NEW_HTML_LINE)
+			}, function (){
+				messageTextArea.val('');
+			});
 	});
-});
+}
+	
+function initButtons(argument) {
+	var sendLocation = jQuery('#'+SEND_LOCATION_ID);
+	sendLocation.on('click', function(){
+		if (!navigator.geolocation)
+			return alert(GEOLOCATION_NOT_ALLOWED);
+		sendLocation.attr(DISABLED_ATTR, DISABLED_ATTR).text(SEND_LOCATION_LABEL+' ...');
+		
+		navigator.geolocation.getCurrentPosition(function(position){
+			sendLocation.removeAttr(DISABLED_ATTR).text(SEND_LOCATION_LABEL);
+			socket.emit(CREATE_LOCATION_MSG_EVENT, {
+				latitude : position.coords.latitude,
+				longitude : position.coords.longitude
+			});
+			console.log(position);
+		}, function(){
+			sendLocation.removeAttr(DISABLED_ATTR).text(SEND_LOCATION_LABEL);
+			sendLocation.val(SEND_LOCATION_LABEL);
+			alert(UNABLE_FETCH_LOCATION);
+		});
+	});
+}
 
 function scrollToBottom()
 {
-	var messages = jQuery('#messages');
 	var newMessage = messages.children('li:last-child');
 
 	var clientHeight = messages.prop('clientHeight');
@@ -137,9 +140,8 @@ function initUsers()
 			modalTitle.innerHTML = children[1].innerHTML;
 
 			var modalTxt = byId(USER_MODAL_TXT_ID);
-			modalTxt.innerHTML = "Active "+moment(this.getAttribute('log')).fromNow();
-			console.log("this.getAttribute('log') : "+this.getAttribute('log')+" moment("+this.getAttribute('log')+" = "+moment(this.log).fromNow());
-			$('#userModal').modal('show');
+			modalTxt.innerHTML = "Active "+moment(this.getAttribute(LOG_ATTR)).fromNow();
+			$('#'+USER_MODAL_ID).modal('show');
 		};
 	}
 }
@@ -149,25 +151,24 @@ function getNewMessageObject(message)
 	var obj = {
 		senderId : message.from.id,
 		from : message.from.name,
-		createdAt : moment(message.createdAt).format('h:mm a'),
-		itemClass : 'ChatLog__entry'
+		createdAt : moment(message.createdAt).format(MOMENT_DATE_FORMAT),
+		itemClass : CHATLOG_ENTRY_CLASS
 	}
 
-	var messages = jQuery('#messages');
 	var last = messages.children('li:last-child');
 	if (last.length)
 	{
-		var lastClass = last.attr('class');
-		if (last.attr('senderId') == obj.senderId)
+		var lastClass = last.attr(CLASS_ATTR);
+		if (last.attr(SENDER_ID_ATTR) == obj.senderId)
 			obj.itemClass = lastClass;
-		else if (lastClass == 'ChatLog__entry')
-			obj.itemClass += ' ChatLog__entry_mine';
+		else if (lastClass == CHATLOG_ENTRY_CLASS)
+			obj.itemClass += ' '+CHATLOG_ENTRY_MINE_CLASS;
 	}
 
 	if (message.from.fileName)
-		obj.imgSrc = 'uploads/'+message.from.fileName;
+		obj.imgSrc = UPLOAD_DIR+message.from.fileName;
 	else
-		obj.imgSrc = 'images/user_icon.png';
+		obj.imgSrc = USER_ICON;
 
 	return obj;
 }
@@ -176,7 +177,8 @@ function renderTemplate(templateId, obj)
 {
 	var template = jQuery('#'+templateId).html();
 	var html = Mustache.render(template, obj);
-	jQuery('#messages').append(html);
+	messages.append(html);
 	scrollToBottom();
+
 	$('[data-toggle="tooltip"]').tooltip();
 }

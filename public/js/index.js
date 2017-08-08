@@ -1,11 +1,25 @@
 //Socket connection
 var socket = io();
+//Init the footer
+initFooter();
 //Init listeners for every tab 
 initTabs();
 //Add listeners on sockeet object
 initSocket();
 //Add listeners on buttons (join and about)
 initButtons();
+
+function initFooter() {
+  //Get the footer element
+  var footer = byId(FOOTER_ID);
+  //Set the copyright label
+  if (footer){
+    //Get the current year
+    var year = new Date().getFullYear();
+    //Modify the label
+    footer.innerHTML = "&copy; "+year+", AKALIA Slimane";
+  }
+}
 
 //Function to initialize the listener to navigate between tabs
 function initTabs()
@@ -169,7 +183,7 @@ function submit(displayName, roomName)
     $('#roomRequiredModal').modal('show');
     return;
   }
-  var params = {name : displayName, room : roomName, fileName : ''};
+  var params = {name : displayName, room : roomName, n : ''};
   var uploadField = byId(UPLOAD_FIELD_ID);
   if (uploadField.value)
   {
@@ -184,10 +198,8 @@ function submit(displayName, roomName)
             contentType: false,
             processData: false,
             success: function (data) {
-                console.log('upload successful! : ');
-                console.log(data);
                 if (data.fileName)
-                  params.fileName = data.fileName;
+                  params.n = data.fileName;
                 else
                   alert('Unable to upload your photo');
 
@@ -196,7 +208,6 @@ function submit(displayName, roomName)
             }
         });
   }else{
-    console.log('Yeaaah man');
     var url = 'chat.html?'+jQuery.param(params);
     window.location.href = url;
   }

@@ -9,15 +9,12 @@
 </head>
 <body class="centered-form">
 	<div class="centered-form__form">
-		<!-- <form action="/chat.html"> -->
 			<div class="form-field">
 				<div class="container">
 				  <img src="images/user_icon.png" class="rounded-circle img-fluid image userMax" id="currentPhoto">
 				  <div class="middle">
 				    <div class="text">
-				    	<!-- <a href="#"> -->
-				    		<img src="images/pencil.png" alt="modify" id="uploadPhotoButton">
-				    	<!-- </a> -->
+				    	<img src="images/pencil.png" alt="modify" id="uploadPhotoButton">
 				    </div>
 				  </div>
 				</div>
@@ -51,12 +48,16 @@
 				<button id="join" class="btn btn-success">Join</button>
 				<button id="about" class="btn btn-primary">About</button>
 			</div>
-		<!-- </form> -->
 	</div>
 
 	<form enctype="multipart/form-data" id="formUpload" method="post" action="/upload">
 		<input type="file" name="upload" id="uploadPhoto" accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp">
 	</form>
+
+	<div class="copyright">
+		<a href="https://www.linkedin.com/in/slimaneakalia" id="footer" target="_blank"></a>
+	</div>
+
 </body>
 
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
@@ -64,7 +65,7 @@
 <script type="text/javascript" src="js/libs/tether.min.js"></script>
 <script type="text/javascript" src="js/libs/bootstrap.js"></script>
 <script type="text/javascript" src="js/constants.js"></script>
-<script type="text/javascript" src="js/general.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
 
 
 <!-- Modals -->
