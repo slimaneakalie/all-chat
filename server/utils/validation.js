@@ -1,3 +1,4 @@
+//Function to verify the string
 var isRealString = function(str){
 	return (typeof str == 'string' && str.trim().length > 0);
 }

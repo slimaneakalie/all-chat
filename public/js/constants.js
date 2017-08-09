@@ -35,6 +35,7 @@ const FOOTER_ID                 = 'footer';
 const GEOLOCATION_NOT_ALLOWED   = 'Geolocation not supported by your browser';
 const NO_ROOM_MSG               = 'No active room for now';
 const UNABLE_FETCH_LOCATION     = 'Unable to fetch geolocation';
+const UNABLE_UPLOAD_PHOTO     = 'Unable to upload your photo';
 
 const ENTER_CODE                = 13;
 

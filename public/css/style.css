@@ -395,3 +395,20 @@ button:hover, .newUser:hover
   {
     color: white;
   }
+
+  .githubLogo
+  {
+      vertical-align: middle;
+      width: 30px;
+  }
+
+
+  .githubLogoContainer:hover
+  {
+      opacity: 0.5;
+  }
+
+  .githubLink
+  {
+      display: inline-block;
+  }

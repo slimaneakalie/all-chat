@@ -1,5 +1,6 @@
 //Require lodash
 const _ = require('lodash');
+//Require moment
 var moment = require('moment');
 //User class definition
 class Users {
@@ -45,4 +46,5 @@ class Users {
 	}
 }
 
+//Export the users class
 module.exports = { Users };
